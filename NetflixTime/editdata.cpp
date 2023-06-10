@@ -21,8 +21,7 @@ EditData::EditData(Content *content, QWidget *parent):
     ui->tableView->setModel(modelForEditData);
 
 
-    QString styleSheet = "background-color: black;";
-    setStyleSheet(styleSheet);
+
 
     QString buttonStyleSheet = "QPushButton { background-color: red; }";
     ui->deleteContentBtn->setStyleSheet(buttonStyleSheet);
