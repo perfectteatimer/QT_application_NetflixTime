@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/resource">
+        <file>datasetNetflixForQt.csv</file>
+        <file>icon.png</file>
+        <file>logo.png</file>
+        <file>poster.jpg</file>
+    </qresource>
+</RCC>
