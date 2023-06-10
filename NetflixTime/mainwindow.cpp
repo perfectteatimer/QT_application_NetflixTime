@@ -31,8 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
     editDataWindow = new EditData(model);
     connect(editDataWindow, &EditData::thirdWindow, this, &MainWindow::show);
 
-    QString styleSheet = "background-color: black;";
-    setStyleSheet(styleSheet);
+ 
     QString buttonStyleSheet = "QPushButton { background-color: olive; }";
     ui->dataButton->setStyleSheet(buttonStyleSheet);
     ui->infoButton->setStyleSheet(buttonStyleSheet);
