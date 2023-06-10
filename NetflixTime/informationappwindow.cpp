@@ -9,8 +9,7 @@ informationAppWindow::informationAppWindow(QWidget *parent) :
     ui->setupUi(this);
     this->setWindowTitle("Information");
 
-    QString styleSheet = "background-color: black;";
-    setStyleSheet(styleSheet);
+ 
 
     QString buttonStyleSheet = "QPushButton { background-color: olive; }";
     ui->backToMainwindow->setStyleSheet(buttonStyleSheet);
