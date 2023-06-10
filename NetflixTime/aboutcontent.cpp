@@ -5,8 +5,7 @@ AboutContent::AboutContent(QTableView *_myTable, Content *model, QWidget *parent
     QDialog(parent),
     ui(new Ui::AboutContent)
 {
-    QString styleSheet = "background-color: black;";
-    setStyleSheet(styleSheet);
+  
     modelForAboutContent = model;
     myTable = _myTable;
     ui->setupUi(this);
