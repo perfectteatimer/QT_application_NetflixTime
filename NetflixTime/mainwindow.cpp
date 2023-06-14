@@ -31,11 +31,14 @@ MainWindow::MainWindow(QWidget *parent)
     editDataWindow = new EditData(model);
     connect(editDataWindow, &EditData::thirdWindow, this, &MainWindow::show);
 
- 
+
     QString buttonStyleSheet = "QPushButton { background-color: olive; }";
     ui->dataButton->setStyleSheet(buttonStyleSheet);
     ui->infoButton->setStyleSheet(buttonStyleSheet);
     ui->editDataButton->setStyleSheet(buttonStyleSheet);
+
+    QString styleSheet = "background-color: black;";
+    setStyleSheet(styleSheet);
 }
 
 
@@ -71,7 +74,6 @@ void MainWindow::on_editDataButton_clicked()
 void MainWindow::on_actionView_logo_triggered()
 {
     QDialog* logoDialog = new QDialog(this);
-    logoDialog->setStyleSheet("background-color: black;");
 
     QLabel* logoLabel = new QLabel(logoDialog);
     logoLabel->setFixedSize(600, 600);
