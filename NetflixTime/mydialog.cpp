@@ -68,9 +68,10 @@ MyDialog::MyDialog(QTableView *_myTable, Content *model, const QString& callingF
 
     ui->verticalLayout->addLayout(layout);
 
- 
     QString buttonStyleSheet2 = "QPushButton { background-color: green; }";
     ui->saveButton->setStyleSheet(buttonStyleSheet2);
+    QString styleSheet = "background-color: black;";
+    setStyleSheet(styleSheet);
 
     if (callingFunction == "edit")
     {
