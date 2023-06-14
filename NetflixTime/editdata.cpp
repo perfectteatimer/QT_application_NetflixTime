@@ -19,8 +19,8 @@ EditData::EditData(Content *content, QWidget *parent):
     this->setWindowTitle("Edit data");
     modelForEditData = content; // Initialize the Content model
     ui->tableView->setModel(modelForEditData);
-
-
+    QString styleSheet = "background-color: black;";
+    setStyleSheet(styleSheet);
 
 
     QString buttonStyleSheet = "QPushButton { background-color: red; }";
@@ -87,10 +87,3 @@ void EditData::on_deleteContentBtn_clicked()
         ui->tableView->update();
     }
 }
-
-
-
-
-
-
-
