@@ -14,6 +14,9 @@ Data::Data(Content* content, QWidget *parent) :
     this->setWindowTitle("Data");
     modelForData = content;
     ui->tableView->setModel(modelForData);
+    QString styleSheet = "background-color: black;";
+    setStyleSheet(styleSheet);
+
 
     QString buttonStyleSheet = "QPushButton { background-color: olive; }";
     ui->mainPgBtn->setStyleSheet(buttonStyleSheet);
