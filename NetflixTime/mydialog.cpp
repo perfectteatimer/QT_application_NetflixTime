@@ -28,7 +28,7 @@ MyDialog::MyDialog(QTableView *_myTable, Content *model, const QString& callingF
     countryLineEdit = new QLineEdit;
     dateAddedLabel = new QLabel("Date added:");
     dateAddedDateEdit = new QDateEdit;
-    yearLabel = new QLabel("Year:");
+    yearLabel = new QLabel("Year: (should be four-digit number)");
     yearLineEdit = new QLineEdit;
     ratingLabel = new QLabel("Rating:");
     ratingComboBox = new QComboBox; // Use QComboBox for rating selection
