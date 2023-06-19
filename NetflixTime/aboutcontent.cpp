@@ -1,4 +1,5 @@
 #include "aboutcontent.h"
+#include "QtWidgets/qboxlayout.h"
 #include "ui_aboutcontent.h"
 
 AboutContent::AboutContent(QTableView *_myTable, Content *model, QWidget *parent) :
@@ -55,8 +56,8 @@ AboutContent::AboutContent(QTableView *_myTable, Content *model, QWidget *parent
 
     descriptionTextEdit->setReadOnly(true);
 
-    // Set dialog size to 700x700
-    resize(400, 400);
+    // Set dialog size
+    resize(200, 200);
 }
 
 AboutContent::~AboutContent()

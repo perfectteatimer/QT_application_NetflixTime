@@ -8,6 +8,11 @@
 #include <QInputDialog>
 #include "QDebug"
 
+#include <QModelIndexList>
+#include <QSet>
+#include <QList>
+#include <algorithm>
+
 #include "mydialog.h"
 
 
@@ -73,17 +78,41 @@ void EditData::on_editContentBtn_clicked()
 
 }
 
+// переделал для вторника 20го июня
 void EditData::on_deleteContentBtn_clicked()
 {
-    QModelIndex selectedIndex = ui->tableView->currentIndex();
-    if (!ui->tableView->selectionModel()->hasSelection())
+    QModelIndexList selectedIndexes = ui->tableView->selectionModel()->selectedIndexes();
+    if (selectedIndexes.isEmpty())
     {
-        return; // No item selected, nothing to delete
+        return; // No items selected, nothing to delete
     }
-    int row = selectedIndex.row();
-    bool removed = modelForEditData->removeRow(row);
-    if (removed)
+
+    // Collect unique row indexes to delete
+    QSet<int> rowsToDelete;
+    for (const QModelIndex& index : selectedIndexes)
     {
-        ui->tableView->update();
+        rowsToDelete.insert(index.row());
     }
+
+    // Convert the set of row indexes to a list for deletion
+    QList<int> rowsList(rowsToDelete.begin(), rowsToDelete.end());
+    std::sort(rowsList.begin(), rowsList.end(), std::greater<int>()); // Sort in descending order
+
+    // Remove rows from the model
+    for (int row : rowsList)
+    {
+        modelForEditData->removeRow(row);
+    }
+
+    ui->tableView->update();
 }
+
+
+
+
+
+
+
+
+
+

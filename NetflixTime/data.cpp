@@ -17,7 +17,6 @@ Data::Data(Content* content, QWidget *parent) :
     QString styleSheet = "background-color: black;";
     setStyleSheet(styleSheet);
 
-
     QString buttonStyleSheet = "QPushButton { background-color: olive; }";
     ui->mainPgBtn->setStyleSheet(buttonStyleSheet);
 
@@ -45,33 +44,30 @@ void Data::on_mainPgBtn_clicked()
 
 void Data::on_sortByDateAdded_stateChanged(int arg1)
 {
-//    if (arg1 == Qt::Checked) {
-//        modelForData->sortByDateAdded();
-//    }
+    if (arg1 == Qt::Checked)
+        modelForData->sortByDateAdded();
+
 }
 
 void Data::on_sortByYear_stateChanged(int arg1)
 {
-    if (arg1 == Qt::Checked) {
+    if (arg1 == Qt::Checked)
         modelForData->sortByYear();
-    }
 }
 
 void Data::on_sortByRating_stateChanged(int arg1)
 {
-//    if (arg1 == Qt::Checked) {
-//        modelForData->sortByRating();
-//    }
+    if (arg1 == Qt::Checked)
+        modelForData->sortByRating();
 }
+
 
 void Data::on_sortByDuration_stateChanged(int arg1)
 {
-//    if (arg1 == Qt::Checked) {
-//        modelForData->sortByDuration();
-//    }
+    if (arg1 == Qt::Checked)
+        modelForData->sortByDuration();
+
 }
-
-
 
 void Data::on_aboutPictureBtn_clicked()
 {

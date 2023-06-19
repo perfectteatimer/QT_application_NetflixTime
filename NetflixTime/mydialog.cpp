@@ -3,13 +3,13 @@
 #include <QPushButton>
 #include "content.h"
 #include <QDebug>
-
 #include <QString>
+#include <QComboBox>
 
 MyDialog::MyDialog(QTableView *_myTable, Content *model, const QString& callingFunction, QWidget *parent):
     QDialog(parent),
     ui(new Ui::MyDialog),
-    callingFunction(callingFunction) // Initialize the callingFunction member variable
+    callingFunction(callingFunction)
 {
     modelForMyDialog = model;
     myTable = _myTable;
@@ -27,12 +27,12 @@ MyDialog::MyDialog(QTableView *_myTable, Content *model, const QString& callingF
     countryLabel = new QLabel("Country:");
     countryLineEdit = new QLineEdit;
     dateAddedLabel = new QLabel("Date added:");
-    dateAddedLineEdit = new QLineEdit;
+    dateAddedDateEdit = new QDateEdit;
     yearLabel = new QLabel("Year:");
     yearLineEdit = new QLineEdit;
     ratingLabel = new QLabel("Rating:");
-    ratingLineEdit = new QLineEdit;
-    durationLabel = new QLabel("Duration:");
+    ratingComboBox = new QComboBox; // Use QComboBox for rating selection
+    durationLabel = new QLabel("Duration: (Your input should be only 'x min' or 'y Season/s' where x and y numbers)");
     durationLineEdit = new QLineEdit;
     genreLabel = new QLabel("Genre:");
     genreLineEdit = new QLineEdit;
@@ -54,11 +54,11 @@ MyDialog::MyDialog(QTableView *_myTable, Content *model, const QString& callingF
     layout->addWidget(countryLabel);
     layout->addWidget(countryLineEdit);
     layout->addWidget(dateAddedLabel);
-    layout->addWidget(dateAddedLineEdit);
+    layout->addWidget(dateAddedDateEdit);
     layout->addWidget(yearLabel);
     layout->addWidget(yearLineEdit);
     layout->addWidget(ratingLabel);
-    layout->addWidget(ratingLineEdit);
+    layout->addWidget(ratingComboBox);
     layout->addWidget(durationLabel);
     layout->addWidget(durationLineEdit);
     layout->addWidget(genreLabel);
@@ -67,12 +67,10 @@ MyDialog::MyDialog(QTableView *_myTable, Content *model, const QString& callingF
     layout->addWidget(descriptionLineEdit);
 
     ui->verticalLayout->addLayout(layout);
-
     QString buttonStyleSheet2 = "QPushButton { background-color: green; }";
     ui->saveButton->setStyleSheet(buttonStyleSheet2);
-    QString styleSheet = "background-color: black;";
-    setStyleSheet(styleSheet);
 
+    setStyleSheet("background-color: black;");
     if (callingFunction == "edit")
     {
         int row = myTable->selectionModel()->selectedIndexes().first().row();
@@ -82,20 +80,38 @@ MyDialog::MyDialog(QTableView *_myTable, Content *model, const QString& callingF
         directorLineEdit->setText(modelForMyDialog->data(modelForMyDialog->index(row, 3), Qt::DisplayRole).toString());
         castLineEdit->setText(modelForMyDialog->data(modelForMyDialog->index(row, 4), Qt::DisplayRole).toString());
         countryLineEdit->setText(modelForMyDialog->data(modelForMyDialog->index(row, 5), Qt::DisplayRole).toString());
-        dateAddedLineEdit->setText(modelForMyDialog->data(modelForMyDialog->index(row, 6), Qt::DisplayRole).toString());
+
+        QString dateString = modelForMyDialog->data(modelForMyDialog->index(row, 6), Qt::DisplayRole).toString();
+        QDate dateAdded = QDate::fromString(dateString, "yyyy-MM-dd");
+        dateAddedDateEdit->setDate(dateAdded);
+
         yearLineEdit->setText(modelForMyDialog->data(modelForMyDialog->index(row, 7), Qt::DisplayRole).toString());
-        ratingLineEdit->setText(modelForMyDialog->data(modelForMyDialog->index(row, 8), Qt::DisplayRole).toString());
+
+        // Set the current rating in the rating ComboBox
+        QString currentRating = modelForMyDialog->data(modelForMyDialog->index(row, 8), Qt::DisplayRole).toString();
+
+        ratingComboBox->setCurrentText(currentRating);
+
         durationLineEdit->setText(modelForMyDialog->data(modelForMyDialog->index(row, 9), Qt::DisplayRole).toString());
         genreLineEdit->setText(modelForMyDialog->data(modelForMyDialog->index(row, 10), Qt::DisplayRole).toString());
         descriptionLineEdit->setText(modelForMyDialog->data(modelForMyDialog->index(row, 11), Qt::DisplayRole).toString());
     }
+
+    // Populate the ratingComboBox with options
+    ratingComboBox->addItem("TV-Y");
+    ratingComboBox->addItem("TV-PG");
+    ratingComboBox->addItem("PG");
+    ratingComboBox->addItem("PG-13");
+    ratingComboBox->addItem("R");
+    ratingComboBox->addItem("TV-MA");
+    ratingComboBox->addItem("NR");
 }
+
 
 MyDialog::~MyDialog()
 {
     delete ui;
 }
-
 
 void MyDialog::on_saveButton_clicked()
 {
@@ -106,9 +122,11 @@ void MyDialog::on_saveButton_clicked()
     newData.director = directorLineEdit->text();
     newData.cast = castLineEdit->text();
     newData.country = countryLineEdit->text();
-    newData.dateAdded = dateAddedLineEdit->text();
+
+    // Get the selected date from the QDateEdit widget
+    newData.dateAdded = dateAddedDateEdit->date();
+
     newData.year = yearLineEdit->text().toInt();
-    newData.rating = ratingLineEdit->text();
     newData.duration = durationLineEdit->text();
     newData.genre = genreLineEdit->text();
     newData.description = descriptionLineEdit->text();
@@ -120,18 +138,17 @@ void MyDialog::on_saveButton_clicked()
     int intDirector = newData.director.toInt();
     int intCast = newData.cast.toInt();
     int intCountry = newData.country.toInt();
-    int intDateAdded = newData.dateAdded.toInt();
-    int intRating = newData.rating.toInt();
     int intDuration = newData.duration.toInt();
     int intGenre = newData.genre.toInt();
     int intDescription = newData.description.toInt();
 
+    bool durationAns = Content().isValidDuration(newData.duration);
 
     if (callingFunction == "add")
     {
         // Check if any required fields are empty
         if (newData.showID.isEmpty() || newData.type.isEmpty() || newData.title.isEmpty() || newData.director.isEmpty() || newData.cast.isEmpty()
-            || newData.country.isEmpty() || newData.dateAdded.isEmpty()|| yearString.isEmpty() || newData.rating.isEmpty() || newData.duration.isEmpty()
+            || newData.country.isEmpty() || yearString.isEmpty() || newData.duration.isEmpty()
             || newData.genre.isEmpty() || newData.description.isEmpty())
         {
             QMessageBox messageBox(this);
@@ -144,39 +161,54 @@ void MyDialog::on_saveButton_clicked()
             return;
         }
         else if (intShowID != 0 || intTitle != 0 || intType != 0 || intDirector != 0 || intCast != 0 || intCountry != 0
-            || intDateAdded != 0 || intRating != 0 || intDirector != 0 || intDuration != 0
-            || intGenre != 0 || yearString == "0" || intDescription != 0)
+         != 0 || intDirector != 0 || intDuration != 0 || intGenre != 0 || (yearString == "0" || yearString.length() != 4) || intDescription != 0 || durationAns == false)
         {
             QMessageBox messageBox(this);
             messageBox.setWindowTitle("Error fields");
-            messageBox.setText("Everything except field 'Year' should be string. Field 'Year'should be integer. Change input data.");
+            messageBox.setText("Everything except the 'Year' field should be a string. Also follow the example how to fill duration line. The 'Year' field should be an integer and valid year. Please change the input data.");
             // Apply a style sheet to change the "OK" button color
             messageBox.setStyleSheet("QPushButton { background-color: green; }");
             messageBox.exec();
             return;
         }
         else
+        {
+            // Set the current rating in the newData object
+            newData.rating = ratingComboBox->currentText();
+
+            // Check if the rating is selected
+            if (newData.rating.isEmpty())
+            {
+                QMessageBox messageBox(this);
+                messageBox.setWindowTitle("Empty Rating");
+                messageBox.setText("Please select a rating from the list.");
+                // Apply a style sheet to change the "OK" button color
+                messageBox.setStyleSheet("QPushButton { background-color: green; }");
+                messageBox.exec();
+                return;
+            }
+
             modelForMyDialog->addData(newData);
+        }
     }
     if (callingFunction == "edit")
     {
+        // Set the current rating in the newData object
+        newData.rating = ratingComboBox->currentText();
+
         if (intShowID != 0 || intTitle != 0 || intType != 0 || intDirector != 0 || intCast != 0 || intCountry != 0
-            || intDateAdded != 0 || intRating != 0 || intDirector != 0 || intDuration != 0
-            || intGenre != 0 || yearString == "0" || intDescription != 0)
+            || intDirector != 0 || intDuration != 0 || intGenre != 0 || (yearString == "0" || yearString.length() != 4) || intDescription != 0 || durationAns == false)
         {
             QMessageBox messageBox(this);
             messageBox.setWindowTitle("Error fields");
-            messageBox.setText("Everything except field 'Year' should be string. Field 'Year'should be integer. Change input data.");
+            messageBox.setText("Everything except the 'Year' field should be a string. The 'Year' field should be an integer and valid year. Also follow the example how to fill duration line. Please change the input data.");
             // Apply a style sheet to change the "OK" button color
             messageBox.setStyleSheet("QPushButton { background-color: green; }");
             messageBox.exec();
             return;
         }
         else
-            modelForMyDialog->updateData(myTable->selectionModel()->selectedIndexes().first(),newData);
+            modelForMyDialog->updateData(myTable->selectionModel()->selectedIndexes().first(), newData);
     }
     close();
-
 }
-
-

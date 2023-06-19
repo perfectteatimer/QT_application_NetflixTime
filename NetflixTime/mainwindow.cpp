@@ -10,17 +10,12 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-//#include "content.h"
-
-
-//#include "content.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     model = new Content;
-    model->loadCSV(":/resource/datasetNetflixForQt.csv");
     ui->setupUi(this);
     aboutWindow = new informationAppWindow();
     connect(aboutWindow, &informationAppWindow::firstWindow, this, &MainWindow::show);
@@ -68,7 +63,6 @@ void MainWindow::on_editDataButton_clicked()
     editDataWindow->show();
     this->close();
 }
-
 
 
 void MainWindow::on_actionView_logo_triggered()
@@ -177,5 +171,20 @@ void MainWindow::on_actionDownload_CSV_triggered()
 
 }
 
+
+// для защиты (сам решил сделать навсякий)
+void MainWindow::on_actionUpload_CSV_triggered()
+{
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Open CSV File"), "", tr("CSV Files (*.csv)"));
+
+    // Check if a file is selected
+    if (!filePath.isEmpty())
+    {
+        model->loadCSV(filePath);
+        QMessageBox::information(this, "File Loaded", "Data was loaded successfully");
+    }
+    else
+        QMessageBox::information(this, "Error", "No file selected");
+}
 
 
