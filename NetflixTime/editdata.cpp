@@ -84,6 +84,7 @@ void EditData::on_deleteContentBtn_clicked()
     QModelIndexList selectedIndexes = ui->tableView->selectionModel()->selectedIndexes();
     if (selectedIndexes.isEmpty())
     {
+        QMessageBox::warning(this, "No Selection", "Please select an item to delete.");
         return; // No items selected, nothing to delete
     }
 
