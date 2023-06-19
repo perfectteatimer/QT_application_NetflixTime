@@ -3,6 +3,8 @@
 
 #include <QAbstractTableModel>
 #include <QList>
+#include <QDate>
+
 
 
 struct TableData {
@@ -12,7 +14,7 @@ struct TableData {
     QString director;
     QString cast;
     QString country;
-    QString dateAdded;
+    QDate dateAdded;
     int year;
     QString rating;
     QString duration;
@@ -38,7 +40,10 @@ public:
 
     bool loadCSV(const QString& filePath);
     void clearData();
-    bool removeRow(int row, const QModelIndex &parent = QModelIndex());
+
+    // для защиты 20го июня
+    bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
+
     bool addData(const TableData& data);
     bool updateData(const QModelIndex &index, const TableData& newData);
 
@@ -47,11 +52,13 @@ public:
     QList<TableData> getListWithAllData() const;
 
     // Sorting functions:
-//    void sortByDateAdded();
-    void sortByYear();
-//    void sortByRating();
-//    void sortByDuration();
+    void sortByDateAdded(); //для защиты
 
+    void sortByYear();
+    void sortByRating();
+    void sortByDuration();
+
+    bool isValidDuration(const QString& duration) const;
 
 
 private:

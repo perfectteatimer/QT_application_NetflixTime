@@ -56,6 +56,7 @@
      <string>Help</string>
     </property>
     <addaction name="actionDownload_CSV"/>
+    <addaction name="actionUpload_CSV"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -74,6 +75,11 @@
   <action name="actionView_logo">
    <property name="text">
     <string>View logo</string>
+   </property>
+  </action>
+  <action name="actionUpload_CSV">
+   <property name="text">
+    <string>Upload CSV</string>
    </property>
   </action>
  </widget>

@@ -27,6 +27,8 @@ private slots:
     void on_actionView_logo_triggered();
     void on_actionDownload_CSV_triggered();
 
+    void on_actionUpload_CSV_triggered();
+
 protected:
     bool eventFilter(QObject* obj, QEvent* event); // Added eventFilter declaration
 

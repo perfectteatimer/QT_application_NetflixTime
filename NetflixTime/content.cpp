@@ -1,8 +1,10 @@
-#include "content.h"
+ #include "content.h"
 #include <QFile>
 #include <QTextStream>
 #include <QStringList>
 #include <QMessageBox>
+#include <QtAlgorithms>
+#include <QDate>
 
 #include <QDebug>
 
@@ -104,7 +106,7 @@ bool Content::loadCSV(const QString& filePath)
         data.director = values[3];
         data.cast = values[4];
         data.country = values[5];
-        data.dateAdded = values[6];
+        data.dateAdded = QDate::fromString(values[6], "MMMM d, yyyy");
         data.year = values[7].toInt();
         data.rating = values[8];
         data.duration = values[9];
@@ -124,13 +126,23 @@ void Content::clearData()
     listWithAllData.clear();
 }
 
-bool Content::removeRow(int row, const QModelIndex &parent)
+
+
+// переделал для защиты 20 июня
+bool Content::removeRows(int row, int count, const QModelIndex& parent)
 {
-    if (row < 0 || row >= listWithAllData.size())
+    Q_UNUSED(parent);
+
+    if (row < 0 || count <= 0 || (row + count) > listWithAllData.size())
         return false;
 
-    beginRemoveRows(parent, row, row);
-    listWithAllData.removeAt(row);
+    beginRemoveRows(QModelIndex(), row, row + count - 1);
+
+    for (int i = 0; i < count; ++i)
+    {
+        listWithAllData.removeAt(row);
+    }
+
     endRemoveRows();
 
     return true;
@@ -148,14 +160,14 @@ bool Content::addData(const TableData& data)
 }
 
 
-//void Content::sortByDateAdded()
-//{
-//    std::sort(listWithAllData.begin(), listWithAllData.end(), [](const TableData& a, const TableData& b) {
-//        return a.dateAdded < b.dateAdded;
-//    });
+void Content::sortByDateAdded()
+{
+    std::sort(listWithAllData.begin(), listWithAllData.end(), [](const TableData& a, const TableData& b) {
+        return a.dateAdded < b.dateAdded;
+    });
 
-//    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
-//}
+    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
+}
 
 void Content::sortByYear()
 {
@@ -166,24 +178,79 @@ void Content::sortByYear()
     emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
 }
 
-//void Content::sortByRating()
-//{
-//    std::sort(listWithAllData.begin(), listWithAllData.end(), [](const TableData& a, const TableData& b) {
-//        return a.rating < b.rating;
-//    });
+// для защиты сделал
+void Content::sortByRating()
+{
+    std::sort(listWithAllData.begin(), listWithAllData.end(), [](const TableData& a, const TableData& b) {
+        // Custom comparator function based on rating order
+        QStringList ratingOrder = { "TV-Y", "TV-PG", "PG", "PG-13", "R", "TV-MA", "NR" };
 
-//    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
-//}
+        // Get the index of ratings in the custom order
+        int indexA = ratingOrder.indexOf(a.rating);
+        int indexB = ratingOrder.indexOf(b.rating);
 
-//void Content::sortByDuration()
-//{
-//    std::sort(listWithAllData.begin(), listWithAllData.end(), [](const TableData& a, const TableData& b) {
-//        return a.year < b.year;
-//    });
+        // Compare the ratings based on the index
+        return indexA < indexB;
+    });
 
-//    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
-//}
+    // Emit the dataChanged signal to notify the view about the sorted data
+    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
+}
 
+void Content::sortByDuration()
+{
+    std::sort(listWithAllData.begin(), listWithAllData.end(), [](const TableData& a, const TableData& b) {
+        QString durationA = a.duration;
+        QString durationB = b.duration;
+
+        // Extract the numeric values and units from durationA
+        int valueA = durationA.split(" ").first().toInt();
+        QString unitA = durationA.split(" ").last();
+
+        // Extract the numeric values and units from durationB
+        int valueB = durationB.split(" ").first().toInt();
+        QString unitB = durationB.split(" ").last();
+
+        // Handle the "min" unit
+        if (unitA == "min" && unitB == "min")
+            return valueA < valueB;
+
+        // Handle the "Season" or "Seasons" unit
+        if ((unitA == "Season" || unitA == "Seasons") && (unitB == "Season" || unitB == "Seasons"))
+            return valueA < valueB;
+
+        // Handle the case when one duration is in minutes and the other is in seasons
+        if (unitA == "min")
+            return true;
+
+        return false;
+    });
+
+    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
+}
+
+bool Content::isValidDuration(const QString& duration) const
+{
+    // Duration format: "x min" or "x Seasons" or "1 Season"
+    QStringList parts = duration.split(" ");
+    if (parts.size() != 2)
+        return false;
+
+    QString value = parts[0];
+    QString unit = parts[1];
+
+    // Check if the value is a valid integer
+    bool isValueInt;
+    value.toInt(&isValueInt);
+    if (!isValueInt)
+        return false;
+
+    // Check if the unit is "min" or "Season" or "Seasons"
+    if (unit != "min" && unit != "Season" && unit != "Seasons")
+        return false;
+
+    return true;
+}
 
 
 bool Content::updateData(const QModelIndex& index, const TableData& newData)
@@ -226,7 +293,7 @@ void Content::writeDataToCSV(const QString& filePath)
         QStringList row;
         row << data.showID << data.type << data.title
             << data.director << data.cast
-            << data.country << data.dateAdded
+            << data.country << data.dateAdded.toString("MMMM d, yyyy")
             << QString::number(data.year) << data.rating
             << data.duration << data.genre
             << data.description;
@@ -235,7 +302,6 @@ void Content::writeDataToCSV(const QString& filePath)
 
     file.close();
     QMessageBox::information(nullptr, "Export done", "Data exported to CSV file.");
-
 }
 
 
