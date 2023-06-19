@@ -172,7 +172,7 @@ void MainWindow::on_actionDownload_CSV_triggered()
 }
 
 
-// для защиты (сам решил сделать навсякий)
+// для защиты (сам решил сделать на всякий)
 void MainWindow::on_actionUpload_CSV_triggered()
 {
     QString filePath = QFileDialog::getOpenFileName(this, tr("Open CSV File"), "", tr("CSV Files (*.csv)"));
