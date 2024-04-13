@@ -1,1 +1,2 @@
-# dsba-itop2023-hw. Final version in defence branch 
+# First-year C++ project on building application using QT framework
+
